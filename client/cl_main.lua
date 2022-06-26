@@ -13,7 +13,7 @@ local function resetSelf()
   ClearPedTasks(PlayerPedId())
 
   if DoesEntityExist(g_targetPed) then
-    DetachEntity(g_targetPed, true, true)
+    --DetachEntity(g_targetPed, true, true)
   end
 
   g_targetPed = 0
@@ -77,24 +77,28 @@ end)
 RegisterCommand("+throwPlayer", function(source, args, rawCommand)
   if DoesEntityExist(g_targetPed) then
 
-    local _, rightVector, _, _ = GetEntityMatrix(g_targetPed)
-    TriggerServerEvent("Radon:throwPlayer", GetPlayerServerId(NetworkGetPlayerIndexFromPed(g_targetPed)), rightVector)
+    TriggerServerEvent("Radon:throwPlayer", GetPlayerServerId(NetworkGetPlayerIndexFromPed(g_targetPed)))
 
     while GetEntityAttachedTo(targetPed) == playerPed do
       Wait(0)
     end
-    
+
+    Wait(500)
     resetSelf()
   end
 end)
 
-RegisterNetEvent("Radon:getThrown", function(rightVector)
+RegisterNetEvent("Radon:getThrown", function()
   local playerPed = PlayerPedId()
+  local _, rightVector, _, _ = GetEntityMatrix(playerPed)
+  
   g_isCarried = false
 
   DetachEntity(playerPed, true, true)
-  ApplyForceToEntity(playerPed, 3, rightVector.x * cfg.forceOffsetX, rightVector.y * cfg.forceOffsetY, cfg.forceOffsetZ, 0.0, 0.0, 0.0, 0, 0, 1, 1, 0, 1)
-end)
+  SetPedToRagdoll(playerPed, 1000, 1000, 0, 0, 0, 0)
+
+  TriggerServerEvent("Radon:applyForce", rightVector)
+end) 
 
 TriggerEvent('chat:removeSuggestion', "+throwPlayer")
 TriggerEvent('chat:removeSuggestion', "-throwPlayer")

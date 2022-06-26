@@ -73,7 +73,7 @@ RegisterNetEvent("Radon:carryPlayer", function(target)
   
 end)
 
-RegisterNetEvent("Radon:throwPlayer", function(target, rightVector)
+RegisterNetEvent("Radon:throwPlayer", function(target)
   local source = source
 
   if isThrowingPed(source) and isBeingCarried(target) then
@@ -81,8 +81,13 @@ RegisterNetEvent("Radon:throwPlayer", function(target, rightVector)
     g_throwingPlayerData[source] = nil
     g_carriedPlayerData[target] = nil
 
-    TriggerClientEvent("Radon:getThrown", target, rightVector)
+    TriggerClientEvent("Radon:getThrown", target)
   end
+end)
+
+RegisterNetEvent("Radon:applyForce", function(rightVector)
+  local source = source
+  ApplyForceToEntity(GetPlayerPed(source), 3, rightVector.x * cfg.forceOffsetX, rightVector.y * cfg.forceOffsetY, rightVector.z +  cfg.forceOffsetZ, 0.0, 0.0, 0.0, 0, 0, 1, 1, 0, 1)
 end)
 
 AddEventHandler('playerDropped', function()
