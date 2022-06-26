@@ -6,14 +6,11 @@ local function getClosestPlayer(source)
   local playerCoords = GetEntityCoords(GetPlayerPed(source))
 
   for _, player in pairs(GetPlayers()) do
+    player = tonumber(player)
+
     if player ~= source then
-
-      if closestPlayer == 0 then
-        closestPlayer = player
-      end
-
       local currentTargetCoords = GetEntityCoords(GetPlayerPed(player))
-      local closestTargetCoords = GetEntityCoords(GetPlayerPed(closestPlayer))
+      local closestTargetCoords = closestPlayer == 0 and vector3(0, 0, 0) or GetEntityCoords(GetPlayerPed(closestPlayer))
 
       local currentDistance = #(currentTargetCoords - playerCoords)
       local closestDistance = #(currentTargetCoords - closestTargetCoords)
@@ -22,6 +19,7 @@ local function getClosestPlayer(source)
         closestPlayer = player
       end
     end
+    
   end
 
   return closestPlayer
@@ -42,7 +40,7 @@ local function isBeingCarried(source)
 end
 
 function ThrowPlayer(source, target)
-  if not target then
+  if target == 0 then
     return notifyClient(source, "~r~You aren't close to any player!")
   end
 
@@ -55,11 +53,36 @@ function ThrowPlayer(source, target)
   end
   
   -- Players passed all checks
+
+  g_throwingPlayerData[source] = target
+  g_carriedPlayerData[target] = source
+
   TriggerClientEvent("Radon:attachEntities", source, target)
 end
 
 RegisterCommand("throw", function(source, args, rawCommand)
   ThrowPlayer(source, getClosestPlayer(source))
+end)
+
+RegisterNetEvent("Radon:carryPlayer", function(target)
+  local source = source
+
+  if isThrowingPed(source) and isBeingCarried(target) then
+    TriggerClientEvent("Radon:syncCarriedPlayer", target, source)
+  end
+  
+end)
+
+RegisterNetEvent("Radon:throwPlayer", function(target, rightVector)
+  local source = source
+
+  if isThrowingPed(source) and isBeingCarried(target) then
+
+    g_throwingPlayerData[source] = nil
+    g_carriedPlayerData[target] = nil
+
+    TriggerClientEvent("Radon:getThrown", target, rightVector)
+  end
 end)
 
 AddEventHandler('playerDropped', function()
