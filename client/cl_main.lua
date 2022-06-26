@@ -25,12 +25,12 @@ function handleControlThread()
   while isPedThrowing() or isPedCarried() do
     Wait(0)
 
-		DisableControlAction(0, 21, true) 
-		DisableControlAction(0, 25, true) 
-		DisableControlAction(0, 47, true) 
-		DisableControlAction(0, 58, true) 
+    DisableControlAction(0, 21, true) 
+    DisableControlAction(0, 25, true) 
+    DisableControlAction(0, 47, true) 
+    DisableControlAction(0, 58, true) 
     DisableControlAction(0, 24, true)
-		DisablePlayerFiring(playerPed, true)
+    DisablePlayerFiring(playerPed, true)
 
   end 
 end
